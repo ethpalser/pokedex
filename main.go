@@ -16,7 +16,7 @@ type cliCommand struct {
 
 type config struct {
 	Next     string
-	Previous any
+	Previous string
 }
 
 func main() {
@@ -49,6 +49,7 @@ func main() {
 				return
 			}
 		}
+		println()
 	}
 }
 
@@ -83,7 +84,6 @@ func (cfg *config) commandHelp() error {
 	for _, command := range c {
 		println(fmt.Sprintf("%s: %s", command.name, command.description))
 	}
-	println()
 	return nil
 }
 

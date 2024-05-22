@@ -74,7 +74,22 @@ func (cfg *config) commandLocationsFwd() error {
 		next = "https://pokeapi.co/api/v2/location-area/"
 	}
 
-	resp, err := http.Get(next)
+	return cfg.commandLocations(next)
+}
+
+func (cfg *config) commandLocationsBck() error {
+	var prev string
+	if cfg.Previous != "" {
+		prev = cfg.Previous
+	} else {
+		return nil
+	}
+
+	return cfg.commandLocations(prev)
+}
+
+func (cfg *config) commandLocations(url string) error {
+	resp, err := http.Get(url)
 	if err != nil {
 		return err
 	}
@@ -94,13 +109,13 @@ func (cfg *config) commandLocationsFwd() error {
 	}
 
 	cfg.Next = locAreas.Next
-	cfg.Previous = locAreas.Previous
+	if locAreas.Previous == nil {
+		cfg.Previous = ""
+	} else {
+		cfg.Previous = locAreas.Previous.(string)
+	}
 	for _, loc := range locAreas.Results {
 		println(loc.Name)
 	}
-	return nil
-}
-
-func (cfg *config) commandLocationsBck() error {
 	return nil
 }
