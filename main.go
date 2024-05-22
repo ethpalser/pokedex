@@ -14,8 +14,14 @@ type cliCommand struct {
 	callback    func() error
 }
 
+type config struct {
+	Next     string
+	Previous any
+}
+
 func main() {
-	commands := commands()
+	config := config{}
+	commands := config.commands()
 	reader := bufio.NewScanner(os.Stdin)
 
 	for {
@@ -46,23 +52,33 @@ func main() {
 	}
 }
 
-func commands() map[string]cliCommand {
+func (cfg *config) commands() map[string]cliCommand {
 	return map[string]cliCommand{
 		"help": {
 			name:        "help",
 			description: "Displays a help message",
-			callback:    commandHelp,
+			callback:    cfg.commandHelp,
 		},
 		"exit": {
 			name:        "exit",
 			description: "Exit the Pokedex",
-			callback:    commandExit,
+			callback:    cfg.commandExit,
+		},
+		"map": {
+			name:        "map",
+			description: "Displays pokemon locations",
+			callback:    cfg.commandLocationsFwd,
+		},
+		"mapb": {
+			name:        "mapb",
+			description: "Displays previous pokemon locations",
+			callback:    cfg.commandLocationsBck,
 		},
 	}
 }
 
-func commandHelp() error {
-	c := commands()
+func (cfg *config) commandHelp() error {
+	c := cfg.commands()
 	print("Usage:\n\n")
 	for _, command := range c {
 		println(fmt.Sprintf("%s: %s", command.name, command.description))
@@ -71,6 +87,6 @@ func commandHelp() error {
 	return nil
 }
 
-func commandExit() error {
+func (cfg *config) commandExit() error {
 	return errors.New("exit")
 }
