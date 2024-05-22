@@ -62,7 +62,7 @@ type LocationArea struct {
 type LocationAreas struct {
 	Count    int            `json:"count"`
 	Next     string         `json:"next"`
-	Previous any            `json:"previous"`
+	Previous *string        `json:"previous"`
 	Results  []LocationArea `json:"results"`
 }
 
@@ -112,7 +112,7 @@ func (cfg *config) commandLocations(url string) error {
 	if locAreas.Previous == nil {
 		cfg.Previous = ""
 	} else {
-		cfg.Previous = locAreas.Previous.(string)
+		cfg.Previous = *locAreas.Previous
 	}
 	for _, loc := range locAreas.Results {
 		println(loc.Name)
