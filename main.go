@@ -17,7 +17,7 @@ type cliCommand struct {
 }
 
 func main() {
-	config := pokeapi.Config{}
+	config := pokeapi.NewConfig()
 	commands := commands(&config)
 	reader := bufio.NewScanner(os.Stdin)
 

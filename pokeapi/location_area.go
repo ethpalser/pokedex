@@ -2,8 +2,6 @@ package pokeapi
 
 import (
 	"encoding/json"
-	"io"
-	"net/http"
 )
 
 type LocationArea struct {
@@ -89,22 +87,16 @@ func (cfg *Config) CommandLocationsBck() error {
 }
 
 func (cfg *Config) commandLocations(url string) error {
-	resp, err := http.Get(url)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-
-	data, ioErr := io.ReadAll(resp.Body)
-	if ioErr != nil {
-		println("An io error occurred")
-		return ioErr
+	data, getErr := cfg.ApiGet(url)
+	if getErr != nil {
+		println("Error getting data from %q", url)
+		return getErr
 	}
 
 	locAreas := LocationAreas{}
 	decErr := json.Unmarshal(data, &locAreas)
 	if decErr != nil {
-		println("A json unmarshal error occurred")
+		println("Error unmarshaling json")
 		return decErr
 	}
 
