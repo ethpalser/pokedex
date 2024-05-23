@@ -85,6 +85,11 @@ func commands(cfg *pokeapi.Config) map[string]cliCommand {
 			description: "Displays pokemon at a location",
 			callback:    cfg.CommandExplore,
 		},
+		"catch": {
+			name:        "catch",
+			description: "Throw a Pokeball in attempt to catch a Pokemon",
+			callback:    cfg.CommandCatch,
+		},
 	}
 }
 

@@ -12,6 +12,7 @@ type Config struct {
 	Next     string      // Next URL of the resource last fetched
 	Previous string      // Previous URL of the resource last fetched
 	Cache    cache.Cache // Cache for api calls
+	Pokedex  *Pokedex    // Pointer to Pokedex database
 }
 
 type CommandError struct {
@@ -32,6 +33,9 @@ func NewConfig() Config {
 		Next:     "",
 		Previous: "",
 		Cache:    cache.NewCache(30 * time.Minute),
+		Pokedex: &Pokedex{
+			data: map[string]Pokemon{},
+		},
 	}
 }
 
