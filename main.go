@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"os"
 	"strings"
+
+	"github.com/ethpalser/pokedex/pokeapi"
 )
 
 type cliCommand struct {
@@ -14,14 +16,9 @@ type cliCommand struct {
 	callback    func() error
 }
 
-type config struct {
-	Next     string
-	Previous string
-}
-
 func main() {
-	config := config{}
-	commands := config.commands()
+	config := pokeapi.Config{}
+	commands := commands(&config)
 	reader := bufio.NewScanner(os.Stdin)
 
 	for {
@@ -53,33 +50,34 @@ func main() {
 	}
 }
 
-func (cfg *config) commands() map[string]cliCommand {
+func commands(cfg *pokeapi.Config) map[string]cliCommand {
 	return map[string]cliCommand{
 		"help": {
 			name:        "help",
 			description: "Displays a help message",
-			callback:    cfg.commandHelp,
+			callback:    commandHelp,
 		},
 		"exit": {
 			name:        "exit",
 			description: "Exit the Pokedex",
-			callback:    cfg.commandExit,
+			callback:    commandExit,
 		},
 		"map": {
 			name:        "map",
 			description: "Displays pokemon locations",
-			callback:    cfg.commandLocationsFwd,
+			callback:    cfg.CommandLocationsFwd,
 		},
 		"mapb": {
 			name:        "mapb",
 			description: "Displays previous pokemon locations",
-			callback:    cfg.commandLocationsBck,
+			callback:    cfg.CommandLocationsBck,
 		},
 	}
 }
 
-func (cfg *config) commandHelp() error {
-	c := cfg.commands()
+func commandHelp() error {
+	// argument can be nil as its method's are not needed
+	c := commands(nil)
 	print("Usage:\n\n")
 	for _, command := range c {
 		println(fmt.Sprintf("%s: %s", command.name, command.description))
@@ -87,6 +85,6 @@ func (cfg *config) commandHelp() error {
 	return nil
 }
 
-func (cfg *config) commandExit() error {
+func commandExit() error {
 	return errors.New("exit")
 }
