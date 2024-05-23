@@ -13,7 +13,7 @@ import (
 type cliCommand struct {
 	name        string
 	description string
-	callback    func() error
+	callback    func(args ...string) error
 }
 
 func main() {
@@ -29,24 +29,32 @@ func main() {
 		}
 
 		token := reader.Text()
-		lower := strings.ToLower(token)
-		c, ok := commands[lower]
+		split := strings.Split(token, " ")
+		if len(split) < 1 {
+			continue
+		}
+
+		command := split[0]
+		args := split[1:]
+
+		c, ok := commands[command]
 		if !ok {
 			fmt.Printf("'%s' is not a valid command\n", token)
 			continue
 		}
 
-		err := c.callback()
+		err := c.callback(args...)
 
 		if err != nil {
 			if err.Error() == "exit" {
 				return
+			} else if errors.Is(err, &pokeapi.CommandError{}) {
+				fmt.Printf("Failed to %v %v\n", c.name, err.Error())
 			} else {
 				print(err.Error())
 				return
 			}
 		}
-		println()
 	}
 }
 
@@ -72,10 +80,15 @@ func commands(cfg *pokeapi.Config) map[string]cliCommand {
 			description: "Displays previous pokemon locations",
 			callback:    cfg.CommandLocationsBck,
 		},
+		"explore": {
+			name:        "explore",
+			description: "Displays pokemon at a location",
+			callback:    cfg.CommandExplore,
+		},
 	}
 }
 
-func commandHelp() error {
+func commandHelp(args ...string) error {
 	// argument can be nil as its method's are not needed
 	c := commands(nil)
 	print("Usage:\n\n")
@@ -85,6 +98,6 @@ func commandHelp() error {
 	return nil
 }
 
-func commandExit() error {
+func commandExit(args ...string) error {
 	return errors.New("exit")
 }

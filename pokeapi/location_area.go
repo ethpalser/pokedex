@@ -2,6 +2,7 @@ package pokeapi
 
 import (
 	"encoding/json"
+	"fmt"
 )
 
 type LocationArea struct {
@@ -64,7 +65,7 @@ type LocationAreas struct {
 	Results  []LocationArea `json:"results"`
 }
 
-func (cfg *Config) CommandLocationsFwd() error {
+func (cfg *Config) CommandLocationsFwd(args ...string) error {
 	var next string
 	if cfg.Next != "" {
 		next = cfg.Next
@@ -75,7 +76,7 @@ func (cfg *Config) CommandLocationsFwd() error {
 	return cfg.commandLocations(next)
 }
 
-func (cfg *Config) CommandLocationsBck() error {
+func (cfg *Config) CommandLocationsBck(args ...string) error {
 	var prev string
 	if cfg.Previous != "" {
 		prev = cfg.Previous
@@ -89,7 +90,6 @@ func (cfg *Config) CommandLocationsBck() error {
 func (cfg *Config) commandLocations(url string) error {
 	data, getErr := cfg.ApiGet(url)
 	if getErr != nil {
-		println("Error getting data from %q", url)
 		return getErr
 	}
 
@@ -108,6 +108,36 @@ func (cfg *Config) commandLocations(url string) error {
 	}
 	for _, loc := range locAreas.Results {
 		println(loc.Name)
+	}
+	return nil
+}
+
+func (cfg *Config) CommandExplore(args ...string) error {
+	if len(args) < 1 || len(args) > 1 {
+		return &CommandError{message: "An area on a map must be provided"}
+	}
+	area := args[0]
+	url := "https://pokeapi.co/api/v2/location-area/" + area
+
+	data, getErr := cfg.ApiGet(url)
+	if getErr != nil {
+		return getErr
+	}
+	loc := LocationArea{}
+	jsonErr := json.Unmarshal(data, &loc)
+	if jsonErr != nil {
+		println("Error unmarshaling json")
+		return jsonErr
+	}
+
+	fmt.Printf("Exploring %v...\n", area)
+	if len(loc.PokemonEncounters) > 0 {
+		println("Found Pokemon:")
+		for _, pkmn := range loc.PokemonEncounters {
+			println(" - " + pkmn.Pokemon.Name)
+		}
+	} else {
+		println("No Pokemon found")
 	}
 	return nil
 }

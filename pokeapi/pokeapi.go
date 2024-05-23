@@ -14,6 +14,19 @@ type Config struct {
 	Cache    cache.Cache // Cache for api calls
 }
 
+type CommandError struct {
+	message string
+}
+
+func (err *CommandError) Error() string {
+	return err.message
+}
+
+func (err *CommandError) Is(e error) bool {
+	_, ok := e.(*CommandError)
+	return ok
+}
+
 func NewConfig() Config {
 	return Config{
 		Next:     "",
@@ -34,6 +47,10 @@ func (c *Config) ApiGet(url string) ([]byte, error) {
 		return nil, err
 	}
 	defer resp.Body.Close()
+
+	if resp.StatusCode >= 300 {
+		return nil, &CommandError{}
+	}
 
 	// Read all data from the io.ReadCloser into a byte array
 	body, ioErr := io.ReadAll(resp.Body)
