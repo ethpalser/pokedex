@@ -98,6 +98,18 @@ type Pokemon struct {
 	} `json:"past_types"`
 }
 
+func (p *Pokemon) String() string {
+	var stats string = ""
+	for _, stat := range p.Stats {
+		stats += fmt.Sprintf("  -%v: %v\n", stat.Stat.Name, stat.BaseStat)
+	}
+	var types string = ""
+	for _, t := range p.Types {
+		types += fmt.Sprintf("  -%v\n", t.Type.Name)
+	}
+	return fmt.Sprintf("Name: %v\nHeight: %v\nWeight: %v\nStats:\n%vTypes:\n%v", p.Name, p.Height, p.Weight, stats, types)
+}
+
 func (cfg *Config) CommandCatch(args ...string) error {
 	if len(args) < 1 || len(args) > 1 {
 		return &CommandError{message: "A Pokemon name must be provided"}
@@ -126,5 +138,18 @@ func (cfg *Config) CommandCatch(args ...string) error {
 	} else {
 		fmt.Printf("%v escaped!\n", pkmn.Name)
 	}
+	return nil
+}
+
+func (cfg *Config) CommandInspect(args ...string) error {
+	if len(args) < 1 || len(args) > 1 {
+		return &CommandError{message: "A Pokemon name must be provided"}
+	}
+	pokemon := args[0]
+	pkmn, ok := cfg.Pokedex.Get(pokemon)
+	if !ok {
+		return &CommandError{message: "you have not caught that pokemon"}
+	}
+	print(pkmn.String())
 	return nil
 }

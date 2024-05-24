@@ -49,7 +49,11 @@ func main() {
 			if err.Error() == "exit" {
 				return
 			} else if errors.Is(err, &pokeapi.CommandError{}) {
-				fmt.Printf("Failed to %v %v\n", c.name, err.Error())
+				if err.Error() != "" {
+					println(err.Error())
+				} else {
+					fmt.Printf("Failed to %v %v\n", c.name, err.Error())
+				}
 			} else {
 				print(err.Error())
 				return
@@ -89,6 +93,11 @@ func commands(cfg *pokeapi.Config) map[string]cliCommand {
 			name:        "catch",
 			description: "Throw a Pokeball in attempt to catch a Pokemon",
 			callback:    cfg.CommandCatch,
+		},
+		"inspect": {
+			name:        "inspect",
+			description: "Inspect a Pokemon you have caught",
+			callback:    cfg.CommandInspect,
 		},
 	}
 }
