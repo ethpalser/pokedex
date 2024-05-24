@@ -99,6 +99,11 @@ func commands(cfg *pokeapi.Config) map[string]cliCommand {
 			description: "Inspect a Pokemon you have caught",
 			callback:    cfg.CommandInspect,
 		},
+		"pokedex": {
+			name:        "pokedex",
+			description: "Display all Pokemon you have caught",
+			callback:    cfg.Pokedex.CommandPokedex,
+		},
 	}
 }
 
